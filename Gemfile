@@ -1,7 +1,10 @@
 source 'https://rubygems.org'
 
 gem 'awesome_print'
+gem 'aws-sdk', '~> 2'
 gem 'colorize'
 gem 'rake'
 gem 'sinatra'
 gem 'pry'
+gem 'thin'
+gem 'json'
