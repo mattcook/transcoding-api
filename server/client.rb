@@ -25,7 +25,7 @@ get '/transcode/:id' do
   progress.to_s
 end
 
-get '/t/help' do
+get '/' do
   Resque.redis = Redis.new
   Resque.enqueue(Job, params)
 end
