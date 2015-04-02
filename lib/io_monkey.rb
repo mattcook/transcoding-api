@@ -4,13 +4,10 @@ if RUBY_PLATFORM =~ /(win|w)(32|64)$/
   begin
     require 'win32/process'
   rescue LoadError
-    "Warning: streamio-ffmpeg is missing the win32-process gem to properly handle hung transcodings. Install the gem (in Gemfile if using bundler) to avoid errors."
+    "Warning: ffmpeg is missing the win32-process gem to properly handle hung transcodings. Install the gem (in Gemfile if using bundler) to avoid errors."
   end
 end
 
-#
-# Monkey Patch timeout support into the IO class
-#
 class IO
   def each_with_timeout(pid, seconds, sep_string=$/)
     last_update = Time.now

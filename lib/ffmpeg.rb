@@ -1,37 +1,36 @@
 class FFMPEG
-
- # http://s3.amazonaws.com/cp476-videos/ouput1.mp4
-
+  MP4 = 'mp4'
+  WEBM = 'webm'
   @@timeout = 30
 
-  def initialize(video, output='ouput1.mp4', options = {})
+  def initialize(video, output='ouput1', options = {})
     @video = video
     @options = nil
-    #@options = "-acodec libfaac -b:a 128k -vcodec mpeg4 -b:v 1200k -flags +aic+mv4"
-    @output_file = output
+    # @options = "-acodec libfaac -b:a 128k -vcodec mpeg4 -b:v 1200k -flags +aic+mv4"
+    @format = MP4
+    @output_file = output.concat('.').concat(@format)
   end
 
   def run(&block)
     transcode_video(&block)
-    # if @options[:validate]
-    #   validate_output_file(&block)
-    #   return encoded
-    # else
-    #   return nil
-    # end
-  end
-
-  def status
-    @info
   end
 
   private
   def transcode_video
+    puts "TRANSCODING?"
+    puts @video.to_json
+    if @format == MP4
+      @video.mp4 = @output_file
+    elsif @format == WEBM
+      @video.webm = @output_file
+    end
+
+    @command = "ffmpeg -y -i #{@video.original} #{@output_file}"
+    puts "_#{@command}"
+    @output = ''
     redis = Redis.new
-    @command = "ffmpeg -y -i #{@video.path} #{@options} #{@output_file}"
-    @output = ""
+
     Open3.popen3(@command) do |stdin, stdout, stderr, wait_thr|
-      puts wait_thr.pid
       begin
         next_line = Proc.new do |line|
           if line.include?("time=")
@@ -40,9 +39,8 @@ class FFMPEG
             else
               time = 0.0
             end
-            progress = ((time / @video.duration) * 100).round(2)
-            redis.set(@video.id, progress)
-            puts progress
+            @video.progress = ((time / @video.duration) * 100).to_i
+            redis.set(@video.id, @video.to_json)
           end
         end
 
