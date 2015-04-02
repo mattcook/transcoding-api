@@ -1,20 +1,12 @@
-require 'resque'
+require 'sinatra'
+require "./config/initialize.rb"
+# require './lib/ffmpeg.rb'
 
 module Job
   @queue = :default
 
-  def self.perform(params)
-    sleep 1
-    puts "Processed a job!"
-  end
-end
-
-module FailingJob
-  @queue = :failing
-
-  def self.perform(params)
-    sleep 1
-    raise 'not processable!'
-    puts "Processed a job!"
+  def self.perform(id, path)
+    video = Video.new(path, id)
+    FFMPEG.new(video).run
   end
 end

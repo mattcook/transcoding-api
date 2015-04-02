@@ -4,12 +4,11 @@ class FFMPEG
 
   @@timeout = 30
 
-  def initialize(video, output='ouput1.mp4', options = {}, id)
+  def initialize(video, output='ouput1.mp4', options = {})
     @video = video
     @options = nil
     #@options = "-acodec libfaac -b:a 128k -vcodec mpeg4 -b:v 1200k -flags +aic+mv4"
     @output_file = output
-    @id = id
   end
 
   def run(&block)
@@ -42,7 +41,8 @@ class FFMPEG
               time = 0.0
             end
             progress = ((time / @video.duration) * 100).round(2)
-            redis.set(@id, progress)
+            redis.set(@video.id, progress)
+            puts progress
           end
         end
 

@@ -1,7 +1,7 @@
 class Video
-  attr_reader :path, :duration, :progress
+  attr_reader :path, :duration, :id, :name
 
-  def initialize(path)
+  def initialize(path, id=nil)
     redis = Redis.new
     unless File.exists?(path)
       url = URI.parse(path)
@@ -12,8 +12,14 @@ class Video
       end
     end
     @path = path
-    @id = rand.to_s[2..11]
-    redis.set(@id, 0)
+    @name = "HELLO#{rand.to_s[2..11]}"
+
+    if id
+      @id = id
+    else
+      @id = rand.to_s[2..11]
+    end
+    # redis.set(@id, 0)
     command = "ffmpeg -i #{path}"
     output = Open3.popen3(command) { |stdin, stdout, stderr| stderr.read }
 
@@ -23,7 +29,7 @@ class Video
 
   def transcode(output_file, options = nil, &block)
     Resque.redis = Redis.new
-    Resque.enqueue(Job, self)
+    Resque.enqueue(Job, @id, @path)
     @id
   end
 end
