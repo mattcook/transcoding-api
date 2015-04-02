@@ -15,7 +15,19 @@ end
 get '/transcode/create' do
   link = params[:link].sub('https', 'http').sub(" ","+")
   video = Video.new(link)
-  video.transcode('output.mp4')
+  id = video.transcode('output.mp4')
+  redirect "/transcode/#{id}"
+end
+
+get '/transcode/:id' do
+  redis = Redis.new
+  progress = redis.get(params[:id])
+  progress.to_s
+end
+
+get '/t/help' do
+  Resque.redis = Redis.new
+  Resque.enqueue(Job, params)
 end
 
 # get 'auth' do

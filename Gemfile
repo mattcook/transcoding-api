@@ -8,3 +8,4 @@ gem 'sinatra'
 gem 'pry'
 gem 'thin'
 gem 'json'
+gem "resque", "~> 2.0.0.pre.1", github: "resque/resque"

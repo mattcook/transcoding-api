@@ -1,16 +1,19 @@
 class Video
-  attr_reader :path, :duration
+  attr_reader :path, :duration, :progress
 
   def initialize(path)
-    url = URI.parse(path)
-    req = Net::HTTP.new(url.host, url.port)
-    res = req.request_head(url.path)
-    if res.code != "200"
-      raise Exeception.new("the url is not accessible")
+    redis = Redis.new
+    unless File.exists?(path)
+      url = URI.parse(path)
+      req = Net::HTTP.new(url.host, url.port)
+      res = req.request_head(url.path)
+      if res.code != "200"
+        raise Exeception.new("the url is not accessible")
+      end
     end
-
     @path = path
-
+    @id = rand.to_s[2..11]
+    redis.set(@id, 0)
     command = "ffmpeg -i #{path}"
     output = Open3.popen3(command) { |stdin, stdout, stderr| stderr.read }
 
@@ -19,6 +22,8 @@ class Video
   end
 
   def transcode(output_file, options = nil, &block)
-    FFMPEG.new(self).run &block
+    Resque.redis = Redis.new
+    Resque.enqueue(Job, self)
+    @id
   end
 end
