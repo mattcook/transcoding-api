@@ -1,9 +1,10 @@
 class Video
-  attr_reader :id, :name,:thumbnail, :original, :duration, :bitrate
+  attr_reader :id, :name, :original, :duration, :bitrate
   attr_accessor :mp4, :webm, :progress
 
   def initialize(path, id=nil)
     redis = Redis.new
+
     unless File.exists?(path)
       url = URI.parse(path)
       req = Net::HTTP.new(url.host, url.port)
@@ -13,9 +14,15 @@ class Video
       end
     end
     @original = path
+
     if id
       @id = id
-      @name, @duration, @bitrate = meta_data(path)
+      name, @duration, @bitrate = meta_data(path)
+      if name.nil?
+        @name = File.basename(path,File.extname(path))
+      else
+        @name = name
+      end
       redis.set(@id, self.to_json)
     else
       @id = rand.to_s[2..11]
@@ -25,7 +32,6 @@ class Video
   def transcode(output_file, options = nil, &block)
     Resque.redis = Redis.new
     Resque.enqueue(Job, @id, @original)
-    @progress = 0
     self.to_json
   end
 

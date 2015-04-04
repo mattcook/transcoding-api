@@ -8,23 +8,33 @@ class AwsApi
 
     check_bucket # create bucket if it does not exist
 
-    return @s3
+    @s3
   end
 
   def get(file_name)
-    obj = @s3.bucket('cp476').object(file_name)
-    obj.presigned_url(:get, acl: 'public-read')
+    s3_bucket.object(file_name).public_url
   end
 
-  def upload(session, name)
-    @s3.bucket('cp476').presigned_post(key:"#{session}/${filename}", acl: 'public_read')
+  def post(file_name)
+    # s3_bucket.object(file_name).presigned_url(:put, expires: 100*60, acl:'public_read')
+  end
+
+  def upload(output_key, local_file)
+    s3_bucket.put_object(
+      key: output_key,
+      body: File.open(local_file)
+    )
   end
 
   private
   def check_bucket
     begin @s3.client.head_bucket(bucket: 'cp476')
     rescue Aws::S3::Errors::NotFound
-      @s3.bucket('cp476').create
+      s3_bucket.create
     end
+  end
+
+  def s3_bucket
+    @s3.bucket('cp476')
   end
 end

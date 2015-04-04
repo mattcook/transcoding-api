@@ -13,18 +13,19 @@ get '/transcode/create' do
   link = params[:link].sub('https', 'http').sub(" ","+")
   video = Video.new(link)
   id = video.transcode('output.mp4')
-
 end
 
 get '/transcode/:id' do
   redis = Redis.new
-  progress = redis.get(params[:id])
-  progress.to_s
+  video = redis.get(params[:id])
+  video.to_s
 end
 
 get '/' do
-  s3 = AwsApi.new(settings.aws_key, settings.aws_secret)
-  s3.get_file('output.mp4')
+  # s3 = AwsApi.new(settings.aws_key, settings.aws_secret)
+  # s3.post('12312/output.mp4')
+  output = FFMPEG.probe(params[:link])
+  output.to_s
 end
 
 get '/upload/:session' do
