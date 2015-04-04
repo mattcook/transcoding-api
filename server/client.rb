@@ -9,9 +9,11 @@ if ENV['ENV'] == 'production'
   set :bind, '0.0.0.0'
 end
 
-get '/transcode/:session/create' do
-  link = params[:link].sub('https', 'http').sub(" ","+")
-  video = Video.new(link)
+s3 = AwsApi.new(settings.aws_key, settings.aws_secret)
+
+post '/transcode/:session' do
+  s3_link = s3.get(params[:file_name])
+  video = Video.new(s3_link)
   id = video.transcode(params[:session])
 end
 
@@ -22,14 +24,12 @@ get '/transcode/:id' do
 end
 
 get '/' do
-  s3 = AwsApi.new(settings.aws_key, settings.aws_secret)
   output = FFMPEG.probe(params[:link])
   output.to_s
 end
 
-get '/upload/:session' do
-  s3 = AwsApi.new(settings.aws_key, settings.aws_secret)
-  resp = s3.upload(params[:session])
+get '/upload/:name' do
+  resp = s3.presigned_upload(params[:name])
   {url: resp.url, fields: resp.fields}
 end
 

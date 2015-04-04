@@ -12,11 +12,11 @@ class AwsApi
   end
 
   def get(file_name)
-    s3_bucket.object(file_name).public_url
+    s3_bucket.object(file_name).public_url.gsub('https','http')
   end
 
-  def post(file_name)
-    # s3_bucket.object(file_name).presigned_url(:get, expires: 100*60, acl:'public_read')
+  def presigned_upload(file_name)
+    s3_bucket.presigned_post(key: file_name, acl: 'public_read')
   end
 
   def upload(output_key, local_file)

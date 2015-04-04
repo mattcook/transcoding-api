@@ -4,15 +4,6 @@ class Video
 
   def initialize(path, id=nil)
     redis = Redis.new
-
-    unless File.exists?(path)
-      url = URI.parse(path)
-      req = Net::HTTP.new(url.host, url.port)
-      res = req.request_head(url.path)
-      if res.code != "200"
-        raise Exeception.new("the url is not accessible")
-      end
-    end
     @original = path
 
     if id
