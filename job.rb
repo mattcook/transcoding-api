@@ -1,6 +1,5 @@
 require 'sinatra'
 require "./config/initialize.rb"
-# require './lib/ffmpeg.rb'
 
 module Job
   @queue = :default

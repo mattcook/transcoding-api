@@ -1,20 +1,26 @@
 class AwsApi
-
-  def new
-    client = AWS::S3::Base.establish_connection!(
-      access_key_id: settings.aws_key,
-      secret_access_key: settings.aws_secret
+  def initialize(key,secret)
+    @s3 = Aws::S3::Resource.new(
+      access_key_id: key,
+      secret_access_key: secret,
+      region: 'us-west-2'
     )
+
+    check_bucket #create bucket if it does not exist
+
+    return @s3
   end
 
-  # get 'auth' do
-  #   s3 = AWS::S3.new
-  #   bucket = s3.buckets['mybucket']
-  #
-  #   s3_file = bucket.objects[filename_variable]
-  #   public_url = s3_file.public_url.to_s
-  #
-  #   movie = FFMPEG::Movie.new(public_url.to_s.sub('https', 'http'))
-  # end
+  def get_file(input)
+    obj = @s3.bucket('cp476').object(input)
+    obj.presigned_url(:get, expires_in: 3600)
+  end
 
+  private
+  def check_bucket
+    begin @s3.client.head_bucket(bucket: 'cp476')
+    rescue Aws::S3::Errors::NotFound
+      @s3.bucket('cp476').create
+    end
+  end
 end

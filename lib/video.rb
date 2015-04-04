@@ -1,5 +1,5 @@
 class Video
-  attr_reader :id, :name, :original, :duration, :bitrate
+  attr_reader :id, :name,:thumbnail, :original, :duration, :bitrate
   attr_accessor :mp4, :webm, :progress
 
   def initialize(path, id=nil)

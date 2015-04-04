@@ -1,5 +1,6 @@
 require 'sinatra'
 require 'sinatra/config_file'
+require './config/initialize.rb'
 
 config_file '../config.yml'
 
@@ -22,7 +23,8 @@ get '/transcode/:id' do
 end
 
 get '/' do
-  @greeting = settings.aws_key
+  s3 = AwsApi.new(settings.aws_key, settings.aws_secret)
+  s3.get_file('output.mp4')
 end
 
 get '/console' do
