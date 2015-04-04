@@ -27,6 +27,12 @@ get '/' do
   s3.get_file('output.mp4')
 end
 
+get '/upload/:session' do
+  s3 = AwsApi.new(settings.aws_key, settings.aws_secret)
+  resp = s3.upload(params[:session])
+  {url: resp.url, fields: resp.fields}
+end
+
 get '/console' do
   binding.pry
 end

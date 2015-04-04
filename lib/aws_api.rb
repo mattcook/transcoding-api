@@ -6,14 +6,18 @@ class AwsApi
       region: 'us-west-2'
     )
 
-    check_bucket #create bucket if it does not exist
+    check_bucket # create bucket if it does not exist
 
     return @s3
   end
 
-  def get_file(input)
-    obj = @s3.bucket('cp476').object(input)
-    obj.presigned_url(:get, expires_in: 3600)
+  def get(file_name)
+    obj = @s3.bucket('cp476').object(file_name)
+    obj.presigned_url(:get, acl: 'public-read')
+  end
+
+  def upload(session, name)
+    @s3.bucket('cp476').presigned_post(key:"#{session}/${filename}", acl: 'public_read')
   end
 
   private
