@@ -5,12 +5,12 @@ class FFMPEG
   WEBM = 'webm'
   @@timeout = 30
 
-  def initialize(video, output='ouput1', encoding='mp4', options = {})
+  def initialize(video, output, encoding, options=nil)
     @video = video
     @options = nil
     # @options = "-acodec libfaac -b:a 128k -vcodec mpeg4 -b:v 1200k -flags +aic+mv4"
     @format = encoding
-    @output_file = output.concat('.').concat(encoding)
+    @output_file = output
   end
 
   def run(&block)

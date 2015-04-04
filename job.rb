@@ -12,21 +12,22 @@ class Job < Sinatra::Base
     redis = Redis.new
     @video = Video.new(path, id)
 
-    file_name = @video.name
+    mp4 = "#{@video.name}.mp4"
+    webm = "#{@video.name}.webm"
 
-    FFMPEG.new(@video, file_name, "mp4").run
-    key = "#{session}/#{file_name}"
-    s3.upload(key, "tmp/#{file_name}")
-    @video.mp4 = s3.get(file_name)
-    File.delete("tmp/#{file_name}")
+    FFMPEG.new(@video, mp4, "mp4").run
+    key = "#{session}/#{mp4}"
+    s3.upload(key, "tmp/#{mp4}")
+    @video.mp4 = s3.get("#{session}/#{mp4}")
+    File.delete("tmp/#{mp4}")
+
+    FFMPEG.new(@video, webm, 'webm').run
+    key = "session/#{webm}"
+    s3.upload(key, "tmp/#{webm}")
+    @video.webm = s3.get("#{session}/#{webm}")
+    File.delete("tmp/#{webm}")
+
     @video.progress = 100
-
-    # FFMPEG.new(@video, file_name, 'webm').run
-    # key = "session/#{file_name}"
-    # s3.upload(key, "tmp/#{file_name}")
-    # @video.mp4 = s3.get(file_name)
-    # File.delete(file_name)
-    # @video.progress = 100
 
     redis.set(@video.id, @video.to_json)
   end

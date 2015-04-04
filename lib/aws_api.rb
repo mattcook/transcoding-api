@@ -16,25 +16,26 @@ class AwsApi
   end
 
   def post(file_name)
-    # s3_bucket.object(file_name).presigned_url(:put, expires: 100*60, acl:'public_read')
+    # s3_bucket.object(file_name).presigned_url(:get, expires: 100*60, acl:'public_read')
   end
 
   def upload(output_key, local_file)
     s3_bucket.put_object(
       key: output_key,
-      body: File.open(local_file)
+      body: File.open(local_file),
+      acl: 'public-read'
     )
   end
 
   private
   def check_bucket
-    begin @s3.client.head_bucket(bucket: 'cp476')
+    begin @s3.client.head_bucket(bucket: 'cp476-vids')
     rescue Aws::S3::Errors::NotFound
-      s3_bucket.create
+      s3_bucket.create(acl: 'public-read')
     end
   end
 
   def s3_bucket
-    @s3.bucket('cp476')
+    @s3.bucket('cp476-vids')
   end
 end
