@@ -31,7 +31,7 @@ class Video
 
   def transcode(output_file, options = nil, &block)
     Resque.redis = Redis.new
-    Resque.enqueue(Job, @id, @original)
+    Resque.enqueue(Job, @id, @original, '21321241254')
     self.to_json
   end
 

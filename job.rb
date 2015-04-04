@@ -1,18 +1,21 @@
 require 'sinatra'
 require './config/initialize.rb'
 
-module Job
+class Job < Sinatra::Base
+  register Sinatra::ConfigFile
+  config_file 'config.yml'
+
   @queue = :default
 
-  def self.perform(id, path)
-    s3 = AwsApi.new(KEY GOES HERE, SECRET GOES HERE)
+  def self.perform(id, path, session)
+    s3 = AwsApi.new(settings.aws_key, settings.aws_secret)
     redis = Redis.new
     @video = Video.new(path, id)
 
     file_name = @video.name
 
     FFMPEG.new(@video, file_name, "mp4").run
-    key = "sessi23213on/#{file_name}"
+    key = "#{session}/#{file_name}"
     s3.upload(key, "tmp/#{file_name}")
     @video.mp4 = s3.get(file_name)
     File.delete("tmp/#{file_name}")

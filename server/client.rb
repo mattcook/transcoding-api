@@ -22,7 +22,7 @@ get '/transcode/:id' do
 end
 
 get '/' do
-  # s3 = AwsApi.new(settings.aws_key, settings.aws_secret)
+  s3 = AwsApi.new(settings.aws_key, settings.aws_secret)
   # s3.post('12312/output.mp4')
   output = FFMPEG.probe(params[:link])
   output.to_s
