@@ -12,6 +12,9 @@
 /test/version_tmp/
 /tmp/
 
+## hide aws keys
+config.yml
+
 ## Specific to RubyMotion:
 .dat*
 .repl_history

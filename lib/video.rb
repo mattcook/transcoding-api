@@ -1,5 +1,5 @@
 class Video
-  attr_reader :id, :name, :original, :duration
+  attr_reader :id, :name, :original, :duration, :bitrate
   attr_accessor :mp4, :webm, :progress
 
   def initialize(path, id=nil)
@@ -15,12 +15,11 @@ class Video
     @original = path
     if id
       @id = id
-      @name = 'This is my new output video'
-      @duration = meta_data(path)
+      @name, @duration, @bitrate = meta_data(path)
+      redis.set(@id, self.to_json)
     else
       @id = rand.to_s[2..11]
     end
-    redis.set(@id, self.to_json)
   end
 
   def transcode(output_file, options = nil, &block)
@@ -36,14 +35,6 @@ class Video
 
   private
   def meta_data(link)
-    command = "ffmpeg -i #{link}"
-    output = Open3.popen3(command) { |stdin, stdout, stderr| stderr.read }
-
-    output[/Duration: (\d{2}):(\d{2}):(\d{2}\.\d{2})/]
-    duration = ($1.to_i*60*60) + ($2.to_i*60) + $3.to_f
+    FFMPEG.probe(link)
   end
-
-
-
-
 end

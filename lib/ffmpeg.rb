@@ -15,10 +15,14 @@ class FFMPEG
     transcode_video(&block)
   end
 
+  def self.probe(link)
+    probe_command = "ffprobe -print_format json #{link}"
+    output = JSON.parse(open("|#{probe_command}").read())
+    [output['format']['title'], output['format']['duration'], output['format']['bit_rate']]
+  end
+
   private
   def transcode_video
-    puts "TRANSCODING?"
-    puts @video.to_json
     if @format == MP4
       @video.mp4 = @output_file
     elsif @format == WEBM
