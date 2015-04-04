@@ -9,10 +9,10 @@ if ENV['ENV'] == 'production'
   set :bind, '0.0.0.0'
 end
 
-get '/transcode/create' do
+post '/transcode/:session' do
   link = params[:link].sub('https', 'http').sub(" ","+")
   video = Video.new(link)
-  id = video.transcode('output.mp4')
+  id = video.transcode(params[:session])
 end
 
 get '/transcode/:id' do
