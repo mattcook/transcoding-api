@@ -21,18 +21,19 @@ class Job < Sinatra::Base
     key = "#{session}/#{mp4}"
     s3.upload(key, "tmp/#{mp4}")
     @video.mp4 = s3.get("#{session}/#{mp4}")
-    File.delete("tmp/#{mp4}")
+
 
     redis.set(@video.id, @video.to_json)
-
-    FFMPEG.new(@video, webm, 'webm', webm_options).run
+    FFMPEG.new(@video, webm, 'webm', nil).run
     key = "#{session}/#{webm}"
     s3.upload(key, "tmp/#{webm}")
+
     @video.webm = s3.get("#{session}/#{webm}")
-    File.delete("tmp/#{webm}")
-
     @video.progress = 100
-
     redis.set(@video.id, @video.to_json)
+
+    # clean up files
+    File.delete("tmp/#{mp4}")
+    File.delete("tmp/#{webm}")
   end
 end
