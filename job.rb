@@ -14,8 +14,8 @@ class Job < Sinatra::Base
 
     mp4 = "#{@video.name}.mp4"
     webm = "#{@video.name}.webm"
-    mp4_options = "-acodec libfaac -b:a 128k -vcodec mpeg4 -b:v 1200k -flags +aic+mv4"
-    webm_options = "-c:v libvpx -crf 10 -b:v 1M -c:a libvorbis"
+    mp4_options = "-acodec aac -b:a 128k -vcodec mpeg4 -b:v 1200k -flags +aic+mv4 -strict -2"
+    webm_options = "-acodec libvorbis -ac 2 -b:a 96k -ar 44100 -b:v 345k -s 640x360"
 
     FFMPEG.new(@video, mp4, "mp4", mp4_options).run
     key = "#{session}/#{mp4}"
