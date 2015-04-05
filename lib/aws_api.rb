@@ -20,11 +20,12 @@ class AwsApi
     s3_bucket.presigned_post(key: file_name, acl: 'public_read')
   end
 
-  def upload(output_key, local_file)
+  def upload(output_key, local_file, type)
     s3_bucket.put_object(
       key: output_key,
       body: File.open(local_file),
-      acl: 'public-read'
+      acl: 'public-read',
+      content_type: "video/#{type}"
     )
   end
 

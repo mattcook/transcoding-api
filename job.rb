@@ -19,14 +19,14 @@ class Job < Sinatra::Base
 
     FFMPEG.new(@video, mp4, "mp4", mp4_options).run
     key = "#{session}/#{mp4}"
-    s3.upload(key, "tmp/#{mp4}")
+    s3.upload(key, "tmp/#{mp4}", 'mp4')
     @video.mp4 = s3.get("#{session}/#{mp4}")
 
 
     redis.set(@video.id, @video.to_json)
     FFMPEG.new(@video, webm, 'webm', nil).run
     key = "#{session}/#{webm}"
-    s3.upload(key, "tmp/#{webm}")
+    s3.upload(key, "tmp/#{webm}", 'webm')
 
     @video.webm = s3.get("#{session}/#{webm}")
     @video.progress = 100
