@@ -12,21 +12,28 @@ end
 s3 = AwsApi.new(settings.aws_key, settings.aws_secret)
 
 before do
-   content_type :json
-   headers 'Access-Control-Allow-Origin' => '*',
-            'Access-Control-Allow-Methods' => ['OPTIONS', 'GET', 'POST']
+  headers 'Access-Control-Allow-Origin' => '*'
+  headers 'Access-Control-Allow-Headers' => '*'
+  headers 'Access-Control-Allow-Methods' => 'GET,POST,PUT,DELETE,OPTIONS'
 end
 
-post '/transcode/:session/' do
-  s3_link = s3.get(params[:file_name])
-  video = Video.new(s3_link)
-  id = video.transcode(params[:session])
+options "*" do
+  response.headers["Allow"] = "HEAD,GET,PUT,POST,DELETE,OPTIONS"
+  response.headers["Access-Control-Allow-Headers"] = "X-Requested-With, X-HTTP-Method-Override, Content-Type, Cache-Control, Accept"
+  200
 end
 
-get '/transcode/:id' do
+get '/info/:id' do
   redis = Redis.new
   video = redis.get(params[:id])
   video.to_s
+end
+
+post '/transcode' do
+  data = JSON.parse(request.body.read)
+  s3_link = s3.get(data['file_name'])
+  video = Video.new(s3_link)
+  id = video.transcode(data['session'])
 end
 
 get '/' do

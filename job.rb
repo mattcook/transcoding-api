@@ -23,8 +23,10 @@ class Job < Sinatra::Base
     @video.mp4 = s3.get("#{session}/#{mp4}")
     File.delete("tmp/#{mp4}")
 
+    redis.set(@video.id, @video.to_json)
+
     FFMPEG.new(@video, webm, 'webm', webm_options).run
-    key = "session/#{webm}"
+    key = "#{session}/#{webm}"
     s3.upload(key, "tmp/#{webm}")
     @video.webm = s3.get("#{session}/#{webm}")
     File.delete("tmp/#{webm}")
