@@ -14,14 +14,16 @@ class Job < Sinatra::Base
 
     mp4 = "#{@video.name}.mp4"
     webm = "#{@video.name}.webm"
+    mp4_options = "-acodec libfaac -b:a 128k -vcodec mpeg4 -b:v 1200k -flags +aic+mv4"
+    webm_options = "-c:v libvpx -crf 10 -b:v 1M -c:a libvorbis"
 
-    FFMPEG.new(@video, mp4, "mp4").run
+    FFMPEG.new(@video, mp4, "mp4", mp4_options).run
     key = "#{session}/#{mp4}"
     s3.upload(key, "tmp/#{mp4}")
     @video.mp4 = s3.get("#{session}/#{mp4}")
     File.delete("tmp/#{mp4}")
 
-    FFMPEG.new(@video, webm, 'webm').run
+    FFMPEG.new(@video, webm, 'webm', webm_options).run
     key = "session/#{webm}"
     s3.upload(key, "tmp/#{webm}")
     @video.webm = s3.get("#{session}/#{webm}")

@@ -7,8 +7,7 @@ class FFMPEG
 
   def initialize(video, output, encoding, options=nil)
     @video = video
-    @options = nil
-    # @options = "-acodec libfaac -b:a 128k -vcodec mpeg4 -b:v 1200k -flags +aic+mv4"
+    @options = options
     @format = encoding
     @output_file = output
   end
@@ -24,7 +23,7 @@ class FFMPEG
   end
 
   def transcode_video
-    @command = "ffmpeg -y -i #{@video.original} tmp/#{@output_file}"
+    @command = "ffmpeg -y -i #{@video.original} #{@options} tmp/#{@output_file}"
     puts "_#{@command}"
     @output = ''
     redis = Redis.new

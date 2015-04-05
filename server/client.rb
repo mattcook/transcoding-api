@@ -11,7 +11,13 @@ end
 
 s3 = AwsApi.new(settings.aws_key, settings.aws_secret)
 
-post '/transcode/:session' do
+before do
+   content_type :json
+   headers 'Access-Control-Allow-Origin' => '*',
+            'Access-Control-Allow-Methods' => ['OPTIONS', 'GET', 'POST']
+end
+
+post '/transcode/:session/' do
   s3_link = s3.get(params[:file_name])
   video = Video.new(s3_link)
   id = video.transcode(params[:session])

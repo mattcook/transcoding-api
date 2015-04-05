@@ -12,7 +12,8 @@ class AwsApi
   end
 
   def get(file_name)
-    s3_bucket.object(file_name).public_url.gsub('https','http')
+    link = s3_bucket.object(file_name).public_url
+    link.gsub('https','http')
   end
 
   def presigned_upload(file_name)
