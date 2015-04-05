@@ -4,8 +4,9 @@ require './config/initialize.rb'
 
 config_file '../config.yml'
 
+configure { set :server, :puma }
+
 if ENV['ENV'] == 'production'
-  set :port, 80
   set :bind, '0.0.0.0'
 end
 
@@ -36,16 +37,7 @@ post '/transcode' do
   id = video.transcode(data['session'])
 end
 
-get '/' do
-  output = FFMPEG.probe(params[:link])
-  output.to_s
-end
-
 get '/upload/:name' do
   resp = s3.presigned_upload(params[:name])
   {url: resp.url, fields: resp.fields}
-end
-
-get '/console' do
-  binding.pry
 end

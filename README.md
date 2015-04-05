@@ -1,6 +1,12 @@
 # VideoTranscoder
 Video Transcoding Repo for CP476 Final Project
 
+## Dependencies
+
+Ruby
+Redis
+FFMPEG
+
 ### Installation
 
 ```sh
