@@ -24,7 +24,7 @@ class Job < Sinatra::Base
 
 
     redis.set(@video.id, @video.to_json)
-    FFMPEG.new(@video, webm, 'webm', nil).run
+    FFMPEG.new(@video, webm, 'webm', webm_options).run
     key = "#{session}/#{webm}"
     s3.upload(key, "tmp/#{webm}", 'webm')
 
